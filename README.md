@@ -1,0 +1,148 @@
+# Cyber AI Assistant
+
+A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs locally (or via Tailscale), remembers conversation context, and can execute network diagnostics, read files, fetch CVEs, search the web, and more – all through natural language.
+
+## Features
+
+- **Interactive chat** with conversation memory.
+- **11 built‑in tools**:
+  - `read_file` – read local files.
+  - `run_command` – execute shell commands (dangerous ones ask for confirmation).
+  - `fetch_cve` – get CVE details from NVD.
+  - `web_search` – search the web via SearXNG.
+  - `whois`, `ping`, `nslookup`, `curl`, `port_scan`, `mtr` – full network toolkit.
+- **Auto‑detection** – type `mtr google.com` and it runs the tool directly, no LLM needed.
+- **Fallback skill** – if no tool fits, it automatically uses `web_search`.
+- **Safety** – destructive commands trigger a confirmation prompt.
+- **Privacy** – your LLM endpoint and API keys stay in a local `.env` file (ignored by Git).
+
+## Requirements
+
+- Python 3.8+
+- `pip` (Python package manager)
+- (Optional) `mtr` – for full network diagnostics (`brew install mtr` on macOS)
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/cyber-ai-assistant.git
+cd cyber-ai-assistant
+
+# Create and activate a virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create your .env file from the template
+cp .env.example .env
+# Edit .env and set your LLM endpoint (e.g., http://your-tailscale-ip:11435/v1/chat/completions)
+```
+
+## Usage
+
+### Run the Assistant
+
+From the project directory:
+
+```bash
+python assistant.py
+```
+
+For network diagnostics that require root (e.g., `mtr` on macOS), run with `sudo`:
+
+```bash
+sudo python assistant.py
+```
+
+### Optional: Set Up Shell Aliases
+
+Add these to your `~/.bashrc`, `~/.zshrc`, or equivalent shell config file:
+
+```bash
+# Main interactive assistant with memory + tools
+alias aiassist='python /path/to/your/project/assistant.py'
+
+# Sudo version for privileged tools (e.g., mtr)
+alias sudosai='sudo python /path/to/your/project/assistant.py'
+
+# Quick one‑off question (no tools – if you have oneshot.py)
+alias aiask='python /path/to/your/project/oneshot.py'
+
+# One‑off tool‑only query (if you have agent_tools.py)
+alias aicmd='python /path/to/your/project/agent_tools.py'
+```
+
+Replace `/path/to/your/project` with the actual absolute path to the repository on your machine.
+
+After editing, reload your config:
+
+```bash
+source ~/.zshrc   # or ~/.bashrc
+```
+
+Now you can start the assistant from anywhere by typing `aiassist`.
+
+### Example Commands
+
+```text
+> Read test.txt
+> ping 8.8.8.8
+> mtr google.com
+> whois example.com
+> Search for latest OpenSSL vulnerabilities
+> Explain CVE-2024-1234
+> curl https://api.github.com with user-agent "MyAgent"
+```
+
+### Example Commands
+
+```bash
+> Read test.txt
+> ping 8.8.8.8
+> mtr google.com
+> whois example.com
+> Search for latest OpenSSL vulnerabilities
+> Explain CVE-2024-1234
+> curl https://api.github.com with user-agent "MyAgent"
+```
+
+### Running with `sudo`
+
+Some tools (like `mtr` on macOS) require root privileges. You can run the assistant with `sudo` when needed:
+
+```bash
+sudo python assistant.py
+```
+
+## Configuration (`.env`)
+
+| Variable | Description |
+|----------|-------------|
+| `OLLAMA_URL` | Your LLM endpoint (e.g., `http://100.x.x.x:11435/v1/chat/completions`) |
+| `API_KEY` | API key (leave `dummy` for local Ollama) |
+| `MODEL` | Model name (e.g., `qwen2.5-coder:7b`) |
+| `SEARXNG_URL` | SearXNG instance URL (default: `https://searx.be`) |
+
+## File Structure
+
+```
+cyber-ai-assistant/
+├── assistant.py          # Main script
+├── requirements.txt      # Python dependencies
+├── .env.example          # Environment variable template
+├── .gitignore            # Ignored files
+└── README.md             # This file
+```
+
+## Security Notes
+
+- Never commit your `.env` file – it contains real IPs and keys.
+- Running the assistant with `sudo` gives it full system access – use with caution.
+- The `run_command` tool can execute any command; dangerous ones trigger a confirmation prompt.
+
+## License
+
+MIT (or choose your own).
