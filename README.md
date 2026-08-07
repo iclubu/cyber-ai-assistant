@@ -142,6 +142,14 @@ cyber-ai-assistant/
 ├── .gitignore            # Ignored files
 └── README.md             # This file
 ```
+## Customisation
+You can extend the assistant by:
+
+Adding new tools in the execute_tool() function.
+
+Updating the SYSTEM_PROMPT to change the assistant's personality or rules.
+
+Adding more keywords to auto_tool_detect() for direct command execution.
 
 ## Security Notes
 
