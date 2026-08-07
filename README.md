@@ -4,17 +4,23 @@ A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs
 
 ## Features
 
-- **Interactive chat** with conversation memory.
+- **Interactive chat** with full conversation memory.
 - **11 built‑in tools**:
   - `read_file` – read local files.
   - `run_command` – execute shell commands (dangerous ones ask for confirmation).
-  - `fetch_cve` – get CVE details from NVD.
+  - `fetch_cve` – get CVE details from the NVD API.
   - `web_search` – search the web via SearXNG.
-  - `whois`, `ping`, `nslookup`, `curl`, `port_scan`, `mtr` – full network toolkit.
-- **Auto‑detection** – type `mtr google.com` and it runs the tool directly, no LLM needed.
-- **Fallback skill** – if no tool fits, it automatically uses `web_search`.
-- **Safety** – destructive commands trigger a confirmation prompt.
+  - `whois` – WHOIS lookup for domains/IPs.
+  - `ping` – ping a host (4 packets).
+  - `nslookup` – DNS lookup.
+  - `curl` – fetch URL content (headers + body).
+  - `port_scan` – scan common ports on a host.
+  - `mtr` – My TraceRoute (combined traceroute + ping report).
+- **Auto‑detection** – type `mtr google.com` and it runs the tool directly, bypassing the LLM.
+- **Fallback skill** – if no tool fits, it automatically uses `web_search` to find current information.
+- **Safety** – destructive commands (`rm -rf /`, `mkfs`, etc.) trigger a confirmation prompt before execution.
 - **Privacy** – your LLM endpoint and API keys stay in a local `.env` file (ignored by Git).
+
 
 ## Requirements
 
