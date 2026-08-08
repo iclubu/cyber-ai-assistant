@@ -117,8 +117,21 @@ source ~/.zshrc   # or ~/.bashrc
 | `SEARXNG_URL` | SearXNG instance URL (default: `https://searx.be`) |
 
 
+## File Structure
+```bash
+cyber-ai-assistant/
+├── assistant.py          # Main script
+├── requirements.txt      # Python dependencies
+├── .env.example          # Environment variable template
+├── .gitignore            # Ignored files
+└── README.md             # This file
+```
+## Customization
+### You can extend the assistant by:
+- Adding new tools in the `execute_tool()` function.
+- Updating the `SYSTEM_PROMPT` to change the assistant's personality or detection rules.
+- Adding more keywords to `auto_tool_detect()` for direct command execution.
 
-
-
-
+## License
+### This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
