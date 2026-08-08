@@ -30,16 +30,35 @@ def is_dangerous_command(cmd):
             return True
     return False
 
-SYSTEM_PROMPT = """You are a cybersecurity assistant. When the user provides log content or asks you to analyze logs, follow these rules:
+SYSTEM_PROMPT = """You are a cybersecurity assistant. When analyzing logs, follow these rules based on the log type:
 
-1. **Summarise** – total entries, suspicious count.
-2. **Group by severity** – High (script injection), Medium (event handlers), Low (benign).
-3. **Classify the attack** – if it's XSS, SQLi, etc., state it clearly.
-4. **Give recommendations** – once, not repeated.
+**For Web Logs (Apache, Nginx, WAF):**
+- Look for XSS, SQLi, Path Traversal, Command Injection.
+- Group by severity (High: script/command injection, Medium: event handlers, Low: benign).
+
+**For EDR / Endpoint Logs (Sysmon, Windows Event Logs, CrowdStrike, SentinelOne):**
+- Look for suspicious parent-child process relationships (e.g., Office -> PowerShell, cmd -> wmic).
+- Look for encoded commands (base64, obfuscated).
+- Look for persistence mechanisms (registry Run keys, scheduled tasks).
+- Look for privilege escalation (Event 4672, SeTakeOwnership).
+- Look for lateral movement (PsExec, WMI, SMB).
+
+**For Email Logs (SMTP, Office 365, mail gateways):**
+- Look for authentication failures (SPF, DKIM, DMARC).
+- Look for suspicious attachments (.exe, .scr, .vbs, .js, .docm).
+- Look for impersonation (display name vs. actual email address).
+- Look for known malicious URLs or domains.
+
+For all logs:
+1. Summarise – total entries, suspicious count.
+2. Group by severity – High / Medium / Low.
+3. Classify the attack (e.g., XSS, Persistence, Phishing).
+4. Give concise recommendations.
 
 You have access to tools, but for this analysis you already have the log content in the conversation.
 
-Be concise, safe, and actionable."""
+Be precise, safe, and actionable."""
+
 
 def execute_tool(tool_str, interactive=True):
     match = re.match(r'TOOL:\s*(\w+)\s*[| ]\s*(.+)', tool_str, re.IGNORECASE)
