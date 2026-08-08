@@ -97,6 +97,25 @@ source ~/.zshrc   # or ~/.bashrc
 ```
 ## Log Analysis Capabilities
 ### The assistant can analyze various log formats and detect common attacks:
+| Log Type | What It Detects |
+| :--- | :--- |
+| **Web** (Apache, Nginx, WAF) | XSS, SQLi, Path Traversal, Command Injection |
+| **EDR/Endpoint** (Sysmon, Windows Events, CrowdStrike) | Backdoors, persistence, privilege escalation, encoded commands |
+| **Email** (SMTP, Office 365, mail gateways) | Phishing, spoofing, malicious attachments, impersonation |
+| **Firewall** (iptables, pf, cloud flow logs) | Port scanning, DDoS, unusual egress/ingress |
+| **DNS** (BIND, Windows DNS) | DGA domains, tunneling, excessive queries |
+| **VPN** (OpenVPN, WireGuard, Cisco AnyConnect) | Brute‑force login attempts, unusual client IPs |
+| **Cloud** (AWS CloudTrail, Azure, GCP) | IAM privilege escalation, suspicious API calls |
+| **General** (syslog, application logs) | Anomalies, crashes, unauthorized access |
+
+## Configuration (.env) 
+| Variable | Description |
+|----------|-------------|
+| `OLLAMA_URL` | Your LLM endpoint (e.g., `http://100.x.x.x:11435/v1/chat/completions`) |
+| `API_KEY` | API key (leave `dummy` for local Ollama) |
+| `MODEL` | Model name (e.g., `qwen2.5-coder:7b`) |
+| `SEARXNG_URL` | SearXNG instance URL (default: `https://searx.be`) |
+
 
 
 
