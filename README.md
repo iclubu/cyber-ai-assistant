@@ -47,6 +47,7 @@ Recommendations:
 1. Sanitize all user input.
 2. Implement a Content Security Policy (CSP).
 3. Use parameterized queries for database access.
+```
 
 ## Requirements
 
@@ -133,7 +134,7 @@ source ~/.zshrc   # or ~/.bashrc
 | **Cloud** (AWS CloudTrail, Azure, GCP) | IAM privilege escalation, suspicious API calls |
 | **General** (syslog, application logs) | Anomalies, crashes, unauthorized access |
 
-## Configuration (.env) 
+## ⚙️ Configuration (.env) 
 | Variable | Description |
 |----------|-------------|
 | `OLLAMA_URL` | Your LLM endpoint (e.g., `http://100.x.x.x:11435/v1/chat/completions`) |
@@ -142,7 +143,7 @@ source ~/.zshrc   # or ~/.bashrc
 | `SEARXNG_URL` | SearXNG instance URL (default: `https://searx.be`) |
 
 
-## File Structure
+## 📁  File Structure
 ```bash
 cyber-ai-assistant/
 ├── assistant.py          # Main script
@@ -151,12 +152,18 @@ cyber-ai-assistant/
 ├── .gitignore            # Ignored files
 └── README.md             # This file
 ```
-## Customization
+## 🛠️  Customization
 ### You can extend the assistant by:
 - Adding new tools in the `execute_tool()` function.
 - Updating the `SYSTEM_PROMPT` to change the assistant's personality or detection rules.
 - Adding more keywords to `auto_tool_detect()` for direct command execution.
 
-## License
+## 🔒 Security Notes
+- Never commit your .env file – it contains real IPs and keys.
+- Running the assistant with sudo gives it full system access – use with caution.
+- The run_command tool can execute any command; dangerous ones trigger a confirmation prompt.
+
+
+## 📄  License
 ### This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
