@@ -47,9 +47,7 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env and set your LLM endpoint (e.g., http://your-tailscale-ip:11435/v1/chat/completions)
 
-Usage
-Run the Assistant
-From the project directory:
+
 
 bash
 python assistant.py
