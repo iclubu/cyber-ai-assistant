@@ -74,8 +74,29 @@ alias aiask='python /path/to/your/project/oneshot.py'
 
 # One‑off tool‑only query (if you have agent_tools.py)
 alias aicmd='python /path/to/your/project/agent_tools.py'
-
 ```
+### Replace /path/to/your/project with the absolute path to the repository.
+### After editing, reload your config:
+```bash
+source ~/.zshrc   # or ~/.bashrc
+```
+
+## Example Commands
+```bash
+> Read test.txt
+> ping 8.8.8.8
+> mtr google.com
+> whois example.com
+> Search for latest OpenSSL vulnerabilities
+> Explain CVE-2024-1234
+> curl https://api.github.com with user-agent "MyAgent"
+> cat log.txt
+> analyze log.txt
+> analyze edr_log.txt
+> analyze email_log.txt
+```
+## Log Analysis Capabilities
+### The assistant can analyze various log formats and detect common attacks:
 
 
 
