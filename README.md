@@ -44,6 +44,7 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Create your .env file from the template
+```
 
 ## Usage
 Run the Assistant
