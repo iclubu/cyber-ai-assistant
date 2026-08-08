@@ -2,7 +2,7 @@
 
 A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs locally (or via Tailscale), remembers conversation context, and can execute network diagnostics, read files, fetch CVEs, search the web, and more – all through natural language.
 
-## Features
+## ✨ Features
 
 - Interactive chat with full conversation memory.
 - **11 built‑in tools**:
@@ -23,13 +23,38 @@ A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs
 - **Safety** – destructive commands (`rm -rf /`, `mkfs`, etc.) trigger a confirmation prompt before execution.
 - **Privacy** – your LLM endpoint and API keys stay in a local `.env` file (ignored by Git).
 
+## 🚀 Quick Demo
+
+```text
+> analyze log.txt
+
+📊 Summary
+- Total Entries: 10
+- Suspicious Count: 5
+
+🚨 High Severity
+- GET /index.php?q=<script>alert(1)</script>
+- GET /api?callback=<script>alert(document.cookie)</script>
+
+⚠️ Medium Severity
+- GET /login?user=<img src=x onerror=alert(1)>
+- GET /comment?text=javascript:alert('XSS')
+- GET /profile?name=<svg/onload=alert(1)>
+
+🔐 Attack Type: Cross-Site Scripting (XSS)
+
+Recommendations:
+1. Sanitize all user input.
+2. Implement a Content Security Policy (CSP).
+3. Use parameterized queries for database access.
+
 ## Requirements
 
 - Python 3.8+
 - `pip` (Python package manager)
 - (Optional) `mtr` – for full network diagnostics (`brew install mtr` on macOS)
 
-## Installation
+## 📦 Installation
 
 ```bash
 # Clone the repository
@@ -46,7 +71,7 @@ pip install -r requirements.txt
 # Create your .env file from the template
 ```
 
-## Usage
+## 🧠 Usage
 
 ### Run the Assistant
 
@@ -95,7 +120,7 @@ source ~/.zshrc   # or ~/.bashrc
 > analyze edr_log.txt
 > analyze email_log.txt
 ```
-## Log Analysis Capabilities
+## 📊 Log Analysis Capabilities
 ### The assistant can analyze various log formats and detect common attacks:
 | Log Type | What It Detects |
 | :--- | :--- |
