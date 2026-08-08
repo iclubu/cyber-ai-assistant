@@ -156,7 +156,7 @@ cyber-ai-assistant/
 ### You can extend the assistant by:
 - Adding new tools in the `execute_tool()` function.
 - Updating the `SYSTEM_PROMPT` to change the assistant's personality or detection rules.
-- Adding more keywords to `auto_tool_detect()` for direct command execution.
+   Adding more keywords to `auto_tool_detect()` for direct command execution.
 
 ## 🔒 Security Notes
 - Never commit your .env file – it contains real IPs and keys.
