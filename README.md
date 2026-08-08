@@ -1,4 +1,4 @@
-# Cyber AI Assistant
+# 🛡️🤖 Cyber AI Assistant
 
 A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs locally (or via Tailscale), remembers conversation context, and can execute network diagnostics, read files, fetch CVEs, search the web, and more – all through natural language.
 
