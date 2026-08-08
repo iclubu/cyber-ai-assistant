@@ -47,7 +47,38 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-Run the Assistant
-cp .env.example .env
-# Edit .env and set your LLM endpoint (e.g., http://your-tailscale-ip:11435/v1/chat/completions)
+
+### Run the Assistant
+
+From the project directory:
+
+```bash
+python assistant.py
+```
+## For network diagnostics that require root (e.g., mtr on macOS), run with sudo:
+```bash
+sudo python assistant.py
+```
+
+## Optional: Set Up Shell Aliases
+### Add these to your ~/.bashrc, ~/.zshrc, or equivalent shell config file:
+```bash
+# Main interactive assistant
+alias aiassist='python /path/to/your/project/assistant.py'
+
+# Sudo version for privileged tools
+alias sudosai='sudo python /path/to/your/project/assistant.py'
+
+# Quick one‑off question (if you have oneshot.py)
+alias aiask='python /path/to/your/project/oneshot.py'
+
+# One‑off tool‑only query (if you have agent_tools.py)
+alias aicmd='python /path/to/your/project/agent_tools.py'
+
+```
+
+
+
+
+
 
