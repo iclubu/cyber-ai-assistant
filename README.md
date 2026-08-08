@@ -44,6 +44,13 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Create your .env file from the template
+
+## Usage
+Run the Assistant
+From the project directory:
+
+bash
+python assistant.py
 cp .env.example .env
 # Edit .env and set your LLM endpoint (e.g., http://your-tailscale-ip:11435/v1/chat/completions)
 
