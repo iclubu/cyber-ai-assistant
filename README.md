@@ -1,6 +1,31 @@
-# 🛡️🤖 Cyber AI Assistant
+<h1 align="center">🛡️🤖 Cyber AI Assistant</h1>
 
-A terminal‑based, tool‑powered AI assistant for cybersecurity tasks. It runs locally (or via Tailscale), remembers conversation context, and can execute network diagnostics, read files, fetch CVEs, search the web, and more – all through natural language.
+<p align="center">
+  <strong>A terminal‑based, LLM‑agnostic AI assistant for security operations and log analysis.</strong>
+</p>
+
+<p align="center">
+  Connect it to <strong>any</strong> OpenAI‑compatible API – run locally with Ollama, over Tailscale, or use cloud providers like OpenAI, Groq, or OpenRouter. Your data stays private, and you stay in control.
+</p>
+
+<p align="center">
+  It analyzes <strong>web logs, EDR/Sysmon events, and email/SMTP logs</strong> to detect XSS, SQLi, backdoors, phishing, and more – all through natural language. Plus, it runs network diagnostics, reads files, fetches CVEs, and executes commands.
+</p>
+
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-quick-demo">Quick Demo</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-usage">Usage</a> •
+  <a href="#-log-analysis-capabilities">Log Analysis</a> •
+  <a href="#-configuration">Configuration</a>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License MIT"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.8%2B-blue.svg" alt="Python 3.8+"></a>
+  <a href="https://github.com/iclubu/cyber-ai-assistant/stargazers"><img src="https://img.shields.io/github/stars/iclubu/cyber-ai-assistant.svg?style=social" alt="Stars"></a>
+</p>
 
 ## ✨ Features
 
