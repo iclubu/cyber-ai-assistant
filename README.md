@@ -54,6 +54,7 @@ Recommendations:
 - Python 3.8+
 - `pip` (Python package manager)
 - (Optional) `mtr` – for full network diagnostics (`brew install mtr` on macOS)
+      - https://github.com/traviscross/mtr
 
 ## 📦 Installation
 
