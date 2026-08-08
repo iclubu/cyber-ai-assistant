@@ -7,19 +7,13 @@ import os
 import socket
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# ------------------------------
-# CONFIGURATION (from .env, with safe defaults)
-# ------------------------------
-# Use environment variable OLLAMA_URL or fallback to a generic localhost example
-# For production, set OLLAMA_URL in your .env file.
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/v1/chat/completions")
 MODEL = os.getenv("MODEL", "qwen2.5-coder:7b")
 SEARXNG_URL = os.getenv("SEARXNG_URL", "https://searx.be")
 MAX_TOOL_CALLS = 5
-API_KEY = os.getenv("API_KEY", "dummy")  # unused for local, needed for cloud
+API_KEY = os.getenv("API_KEY", "dummy")
 
 DANGEROUS_PATTERNS = [
     r'rm\s+-rf\s+/',
@@ -36,35 +30,17 @@ def is_dangerous_command(cmd):
             return True
     return False
 
-# ------------------------------
-# SYSTEM PROMPT
-# ------------------------------
-SYSTEM_PROMPT = """You are a tool‑using assistant. You DO NOT have direct knowledge of current events, network state, or live data. You DO NOT generate command outputs yourself – always use the provided tools.
+SYSTEM_PROMPT = """You are a cybersecurity assistant. When the user provides log content or asks you to analyze logs, follow these rules:
 
-For each user request, decide if a tool is needed. If yes, output exactly one line: TOOL: toolname|argument. After you receive the tool result, provide a final answer. If no tool is needed, answer from your built‑in knowledge (knowledge cutoff: October 2023).
+1. **Summarise** – total entries, suspicious count.
+2. **Group by severity** – High (script injection), Medium (event handlers), Low (benign).
+3. **Classify the attack** – if it's XSS, SQLi, etc., state it clearly.
+4. **Give recommendations** – once, not repeated.
 
-RULES:
-- For ANY question about "latest", "current", "today", or recent information → ALWAYS use web_search.
-- For ANY file read, command execution, CVE lookup, URL fetch → use the appropriate tool.
-- NEVER generate fake output. If you're unsure, use web_search or ask for clarification.
+You have access to tools, but for this analysis you already have the log content in the conversation.
 
-Available tools:
-- read_file|<path>
-- run_command|<cmd> (dangerous commands ask for confirmation)
-- fetch_cve|<CVE-ID>
-- web_search|<query>
-- whois|<domain/ip>
-- ping|<host>
-- nslookup|<host>
-- curl|<url>
-- port_scan|<host>
-- mtr|<host>   (full report)
+Be concise, safe, and actionable."""
 
-Be precise, safe, and always use tools when needed."""
-
-# ------------------------------
-# TOOL EXECUTION
-# ------------------------------
 def execute_tool(tool_str, interactive=True):
     match = re.match(r'TOOL:\s*(\w+)\s*[| ]\s*(.+)', tool_str, re.IGNORECASE)
     if not match:
@@ -193,63 +169,84 @@ def execute_tool(tool_str, interactive=True):
     else:
         return f"Unknown tool: {tool}"
 
-# ------------------------------
-# AUTOMATIC TOOL DETECTION
-# ------------------------------
 def auto_tool_detect(user_input):
+    """
+    Returns: (handled, output, content_for_analysis, original_input)
+    - handled: bool, True if we executed a tool.
+    - output: string to print (if any).
+    - content_for_analysis: string (file content) if we read a file and analysis is requested.
+    - original_input: the user's input to be used for analysis.
+    """
     words = user_input.strip().split()
     if not words:
-        return (False, None)
+        return (False, None, None, None)
 
     cmd = words[0].lower()
 
+    # Network tools
     if cmd in ["mtr", "ping", "whois", "nslookup", "port_scan"]:
         if len(words) < 2:
-            return (True, f"Error: Missing argument for {cmd}.")
+            return (True, f"Error: Missing argument for {cmd}.", None, None)
         arg = " ".join(words[1:])
         tool_str = f"TOOL: {cmd}|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        return (True, result, None, None)
 
     if cmd == "curl" and len(words) >= 2:
         arg = " ".join(words[1:])
         tool_str = f"TOOL: curl|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        return (True, result, None, None)
 
-    if cmd in ["read_file", "read"] and len(words) >= 2:
+    # File reading explicit commands
+    if cmd in ["read_file", "read", "cat", "show"] and len(words) >= 2:
         arg = " ".join(words[1:])
         tool_str = f"TOOL: read_file|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        # Check if user wants analysis
+        analysis_keywords = ["analyze", "review", "examine", "inspect", "what type", "is it", "attack", "identify"]
+        if any(kw in user_input.lower() for kw in analysis_keywords):
+            return (True, result, result, user_input)  # result is file content
+        else:
+            return (True, result, None, None)
 
+    # Run command
     if cmd in ["run", "run_command"] and len(words) >= 2:
         arg = " ".join(words[1:])
         tool_str = f"TOOL: run_command|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        return (True, result, None, None)
 
+    # CVE
     if cmd in ["cve", "fetch_cve"] and len(words) >= 2:
         arg = " ".join(words[1:])
         tool_str = f"TOOL: fetch_cve|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        return (True, result, None, None)
 
+    # Web search
     if cmd in ["search", "web_search"] and len(words) >= 2:
         arg = " ".join(words[1:])
         tool_str = f"TOOL: web_search|{arg}"
         result = execute_tool(tool_str, interactive=True)
-        return (True, result)
+        return (True, result, None, None)
 
-    return (False, None)
+    # Generic "analyze log.txt" without explicit command
+    file_match = re.search(r'\b([^\s]+\.(log|txt|csv|json|yml|yaml|xml))\b', user_input, re.IGNORECASE)
+    if file_match:
+        filename = file_match.group(1)
+        analysis_keywords = ["analyze", "review", "examine", "inspect", "what type", "is it", "attack", "identify", "check", "look at"]
+        if any(kw in user_input.lower() for kw in analysis_keywords):
+            tool_str = f"TOOL: read_file|{filename}"
+            result = execute_tool(tool_str, interactive=True)
+            return (True, result, result, user_input)
 
-# ------------------------------
-# MAIN LOOP
-# ------------------------------
+    return (False, None, None, None)
+
 def main():
     print("AI Assistant (type 'exit' to quit)")
     print("Tools: read_file, run_command, fetch_cve, web_search, whois, ping, nslookup, curl, port_scan, mtr")
-    print("Tip: Type commands directly, e.g., 'mtr google.com', 'ping 8.8.8.8'")
+    print("Tip: Type commands directly, e.g., 'cat log.txt', 'analyze log.txt'")
     print("-" * 50)
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -261,29 +258,60 @@ def main():
         if not user_input:
             continue
 
-        # Auto‑detect known tool commands
-        handled, output = auto_tool_detect(user_input)
-        if handled:
+        # Auto‑detect and get content
+        handled, output, content, original_input = auto_tool_detect(user_input)
+
+        if handled and content is not None:
+            # We read a file and the user wants analysis
+            print("\nFile content (for analysis):\n", content)
+            # Build a new user message that includes the file content and the analysis prompt
+            analysis_prompt = f"Here is the content of the log file:\n\n{content}\n\nNow answer the user's question: {original_input}\nProvide a clear summary, severity grouping, attack classification, and recommendations."
+            messages.append({"role": "user", "content": analysis_prompt})
+            # Now let the LLM generate the response
+            try:
+                response = requests.post(
+                    OLLAMA_URL,
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "model": MODEL,
+                        "messages": messages,
+                        "temperature": 0.2,
+                        "stream": False
+                    }
+                )
+                reply = response.json()["choices"][0]["message"]["content"]
+                print("\nAssistant:", reply)
+                messages.append({"role": "assistant", "content": reply})
+            except Exception as e:
+                print(f"\nError connecting to LLM: {e}")
+            continue
+
+        elif handled and output is not None:
+            # Tool executed, just print the output
             print("\nTool Output:\n", output)
             continue
 
-        # Normal LLM flow
+        # Normal LLM flow (no auto-detect)
         messages.append({"role": "user", "content": user_input})
         tool_calls = 0
         reply = None
 
         while tool_calls < MAX_TOOL_CALLS:
-            response = requests.post(
-                OLLAMA_URL,
-                headers={"Content-Type": "application/json"},
-                json={
-                    "model": MODEL,
-                    "messages": messages,
-                    "temperature": 0.2,
-                    "stream": False
-                }
-            )
-            reply = response.json()["choices"][0]["message"]["content"]
+            try:
+                response = requests.post(
+                    OLLAMA_URL,
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "model": MODEL,
+                        "messages": messages,
+                        "temperature": 0.2,
+                        "stream": False
+                    }
+                )
+                reply = response.json()["choices"][0]["message"]["content"]
+            except Exception as e:
+                print(f"\nError connecting to LLM: {e}")
+                break
 
             tool_lines = [line.strip() for line in reply.split('\n') if line.strip().upper().startswith("TOOL:")]
             if tool_lines:
